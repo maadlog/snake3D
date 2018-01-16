@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            /* remove the border */
+            body {
+            border: 0;
+            margin: 0;
+            background-color: white;
+            }
+            /* make the canvas the size of the viewport */
+            canvas {
+            width: 96vw;
+            margin: 2vh 2vw 2vh 2vw;
+            height: 96vh;
+            display: block;
+            }
+        </style>
+
+        <script src="gl-matrix.js"></script>
+        <script src="GameCamera.js"></script>
+        <script src="FollowCamera.js"></script>
+        <script src="Gamebox.js"></script>
+        
+		<script src="GameMaterial.js"></script>
+
+        <script src="GameObjects/Bounds/BoundRectangle.js"></script>
+        <script src="GameObjects/GameObject.js"></script>
+        <script src="GameObjects/GameObject.Cube.js"></script>
+        <script src="GameObjects/GameObject.XZPlane.js"></script>
+        <script src="GameObjects/GameObject.Sphere.js"></script>
+
+        <script src="PathPiece.js"></script>
+        <script src="Path.js"></script>
+        <script src="Bike.js"></script>
+        <script src="FruitGenerator.js"></script>
+        <script src="Fruit.js"></script>
+        <script src="Obstacle.js"></script>
+        <script src="index.js"></script>
+    </head>
+	<body onload="Init()" >
+		<canvas id="canvas" ></canvas>
+	</body>
+</html>
