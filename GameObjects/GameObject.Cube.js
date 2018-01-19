@@ -203,6 +203,7 @@ Cube.prototype.getMovingCenterXZ = function(){
     vector,
     vstep
     );
+    if(!vector || vector[1]==0) console.log("AAAAAH");
   return vector;
 }
 

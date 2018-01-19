@@ -26,7 +26,7 @@ FollowCamera.prototype.update = function(timeElapsed,keysPressed) {
         this.distance += 0.5;
     }
     if(keysPressed["Space"]) { 
-        this.altitude += this.altitude < 95 ? 0.5 : 0;
+        this.altitude += this.altitude < 150 ? 0.5 : 0;
     }
     if(keysPressed["ShiftLeft"]) { 
         this.altitude -= this.altitude > 0.6 ? 0.5 : 0;
@@ -38,10 +38,13 @@ FollowCamera.prototype.update = function(timeElapsed,keysPressed) {
     //     this.following.yrotation,
     //     [0.0,1.0,0.0]);
 
-    var meshPosition = this.following.getMovingCenter();
+
+    var refDistance = [this.distance,this.altitude];
+
+    var meshPosition = this.following.getMovingCenter(refDistance);
     this.lookAt = meshPosition;
 
-    var relativePosition = [0.0,this.altitude,-this.distance];
+    var relativePosition = [0.0,refDistance[1],-refDistance[0]];
     var delta = [];
     vec3.transformMat4(delta,relativePosition,rot);
 
@@ -55,7 +58,7 @@ FollowCamera.prototype.projectionMatrix = function() {
   const fieldOfView = 45 * Math.PI / 180;   // in radians
   const aspect = this.ctx.canvas.clientWidth / this.ctx.canvas.clientHeight;
   const zNear = 0.1;
-  const zFar = 100.0;
+  const zFar = 200.0;
   const projectionMatrix = mat4.create();
 
   mat4.perspective(projectionMatrix,

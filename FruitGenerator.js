@@ -1,8 +1,9 @@
-FruitGenerator = function(ctx,areaStart,size,bike) {
+FruitGenerator = function(ctx,areaStart,size,bikes,readyToNotify) {
 
+    this.readyToNotify = readyToNotify;
     this.fruits = [];
     this.ctx = ctx;
-    this.bike = bike;
+    this.bikes = bikes;
     var areaEnd = [];
     vec3.add(areaEnd,areaStart,[size,0.0,size]);
     this.generator = new RandomPoint(areaStart,areaEnd);
@@ -26,15 +27,21 @@ FruitGenerator.prototype.render = function(ctx,viewMatrix,projectionMatrix) {
 
 FruitGenerator.prototype.update = function(elapsed,keysPressed) {
     this.time += elapsed;
+    if(!this.alreadyNotified && this.fruits.length >= FruitGenerator.MAX_FRUITS ) { this.alreadyNotified = true; this.readyToNotify.ready(); }
     if(this.time >= FruitGenerator.TIME_TO_CREATE && this.fruits.length < FruitGenerator.MAX_FRUITS) { this.createFruit(); this.time = 0; }
     var self = this;
     this.fruits.forEach( function (element,index){
         element.update(elapsed,keysPressed);
-        if (self.checkCollision(element,self.bike.bound))
-        {
-            self.deleteAt(index);
-            self.bike.reward();
-        }
+
+        self.bikes.forEach(bike => {
+            if (self.checkCollision(element,bike.bound))
+            {
+                self.deleteAt(index);
+                bike.reward();
+            }
+        });
+
+        
     });
 };
 

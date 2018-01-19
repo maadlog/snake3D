@@ -7,6 +7,8 @@ GameBox = function(canvas_id) {
     this.gameObjects = [];
     this.keysPressed = {};
 
+    this.uielements = [];
+
     var htmlCanvas = document.getElementById(canvas_id);
     this.canvas = htmlCanvas;
     this.resize();
@@ -44,6 +46,9 @@ var keyUp = function(box) {
 GameBox.prototype.logKey = function(event) {
     this.keysPressed[event.code] = event.type == "keydown";
 };
+GameBox.prototype.ui = function(uielements) {
+    this.uielements = uielements;
+};
 
 GameBox.prototype.cameraFollow = function(object) {
     object.notifyCamera(this.camera);
@@ -66,6 +71,7 @@ GameBox.prototype.resize = function(aGameObject) {
 
 GameBox.prototype.gameLoop = function()
 {
+    if (this.reseting) return;
    window.requestAnimationFrame(this.gameLoop.bind(this));
    this.lastFrameTime = this.currentFrameTime;
    this.currentFrameTime = Date.now();
@@ -82,13 +88,41 @@ GameBox.prototype.register = function(aGameObject) {
     this.gameObjects.push(aGameObject);
 };
 
+GameBox.prototype.reset = function(aGameObject) {
+    this.reseting = true;
+    this.gameObjects = [];
+    Init();
+};
+
+GameBox.prototype.ready = function(all) {
+    if(!!all)
+    {
+        this.uielements.forEach(function(element){ element.hidden = true } );
+    }
+    else{
+        this.uielements.filter(function(item) { return !item.waitUser })
+            .forEach(function(element){ element.hidden = true } );
+    }
+    
+};
+
+
 GameBox.prototype.update = function(timeElapsed)
 {
+    if(this.reseting) return;
     if(this.keysPressed["KeyT"]) { 
         
         var aux = this.camera;
         this.camera = this.pauseCamera;
         this.pauseCamera = aux;
+       }
+    
+       if(this.keysPressed["KeyR"]) { 
+        this.reset();
+       }
+
+       if(this.keysPressed["KeyY"]) { 
+        this.ready(true);
        }
 
     this.camera.update(timeElapsed,this.keysPressed);
@@ -98,8 +132,22 @@ GameBox.prototype.update = function(timeElapsed)
         });
 }
 
+GameBox.prototype.stop = function(timeElapsed)
+{
+    
+    this.gameObjects.forEach( function (value,index,array) {
+            
+            if(!!value.stop){
+                value.stop();
+            }
+                
+        });
+}
+
+
 GameBox.prototype.render= function()
 {
+    if(this.reseting) return;
   this.ctx.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
   this.ctx.clearDepth(1.0);                 // Clear everything
   this.ctx.enable(this.ctx.DEPTH_TEST);           // Enable depth testing

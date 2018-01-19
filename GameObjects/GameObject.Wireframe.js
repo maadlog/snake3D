@@ -1,31 +1,21 @@
-XZPlane = function(ctx,vec3_position,side) {
-	this.vec3_position = vec3_position;
-	this.side = side;
-
-    this.bound = new BoundRectangle([vec3_position[0],vec3_position[2]],[vec3_position[0]+side,vec3_position[2]+side])
-
-    this.restrainedObjects = [];
+Wireframe = function(ctx) {
 	GameObject.call(this,ctx);
 }
-XZPlane.prototype = Object.create(GameObject.prototype);
-XZPlane.prototype.constructor = XZPlane;
+Wireframe.prototype = Object.create(GameObject.prototype);
+Wireframe.prototype.constructor = Wireframe;
 
-XZPlane.prototype.initBuffers = function(ctx) {
+
+Wireframe.prototype.initBuffers = function(ctx) {
+  // override to custom;
+}
+
+
+Wireframe.prototype.customInitBuffers = function(ctx,vertices,indices) {
 	const positionBuffer = ctx.createBuffer();
 
   ctx.bindBuffer(ctx.ARRAY_BUFFER, positionBuffer);
 
-  var x0 = this.vec3_position[0];
-  var y0 = this.vec3_position[1];
-  var z0 = this.vec3_position[2];
-  var side = this.side;
-  
-  const positions = [
-    x0      ,y0     ,z0     ,  
-    x0+side ,y0     ,z0     ,
-    x0      ,y0     ,z0+side,
-    x0+side ,y0     ,z0+side,
-  ];
+  const positions = vertices;
 
   ctx.bufferData(ctx.ARRAY_BUFFER,
                 new Float32Array(positions),
@@ -33,19 +23,12 @@ XZPlane.prototype.initBuffers = function(ctx) {
 
   this.position = positionBuffer;
 
-const faceColors = [
-    [0.0,  0.3921,  0.0,  1.0]
-  ];
-
   // Convert the array of colors into a table for all the vertices.
 
   var colorsArray = [];
 
-  for (var j = 0; j < faceColors.length; ++j) {
-    const c = faceColors[j];
-
-    // Repeat each color four times for the four vertices of the face
-    colorsArray = colorsArray.concat(c, c, c, c);
+  for (var j = 0; j < vertices.length; ++j) {
+    colorsArray = colorsArray.concat([0.0,0.0,0.0,0.1]);
   }
 
   const colorBuffer = ctx.createBuffer();
@@ -63,11 +46,20 @@ const faceColors = [
   // indices into the vertex array to specify each triangle's
   // position.
 
-  const indicesArray = [
-    0,  1,  2,      1,  2,  3,
-  ];
+  var indicesArray = [];
 
-  // Now send the element array to GL
+
+  for (var i = 0; i < indices.length; (i = i+3)) {
+    var line1 = [indices[i]  , indices[i+1]];
+    var line2 = [indices[i+1], indices[i+2]];
+    var line3 = [indices[i+2], indices[i]  ];
+
+    indicesArray = indicesArray.concat(line1);
+    indicesArray = indicesArray.concat(line2);
+    indicesArray = indicesArray.concat(line3);
+  }
+
+
 
   ctx.bufferData(ctx.ELEMENT_ARRAY_BUFFER,
       new Uint16Array(indicesArray), ctx.STATIC_DRAW);
@@ -75,7 +67,7 @@ const faceColors = [
   this.indices = indexBuffer;
 };
 
-XZPlane.prototype.render = function(ctx,viewMatrix,projectionMatrix) {
+Wireframe.prototype.render = function(ctx,viewMatrix,projectionMatrix) {
 	
     this.material.renderBind(ctx,this.transformMatrix,viewMatrix,projectionMatrix);
 
@@ -118,20 +110,9 @@ XZPlane.prototype.render = function(ctx,viewMatrix,projectionMatrix) {
 
 		    const vertexCount = this.indices_count;
 		    const type2 = ctx.UNSIGNED_SHORT;
-		    ctx.drawElements(ctx.TRIANGLES, vertexCount, type2, offset);
+		    ctx.drawElements(ctx.LINES, vertexCount, type2, offset);
   
 };
-XZPlane.prototype.update = function(time) {
-    var self = this;
-    this.restrainedObjects.forEach(restrainedObject => {
-        if( !self.bound.collides(restrainedObject.bound))
-        {
-            restrainedObject.restrain();
-        }
-    });
-    
+Wireframe.prototype.updateMatrix = function(transform) {
+  this.transformMatrix = transform;
 };
-XZPlane.prototype.restrain = function(anObject) {
-    this.restrainedObjects.push(anObject);
-};
-

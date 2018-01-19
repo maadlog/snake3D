@@ -17,4 +17,25 @@ BoundRectangle.prototype.update = function(bottom_left,top_right)
 {
     this.top_right = top_right;
     this.bottom_left = bottom_left;
+
+    if(this.notif &&( !top_right || !bottom_left ) )
+    {
+        this.notif.hit = true;
+    } else {
+       // if (this.notif) this.notif.hit = false;
+    }
 }
+
+BoundRectangle.prototype.notifyError = function(obj)
+{
+    this.notif = obj;
+}
+
+BoundRectangle.prototype.render = function(obj)
+{
+    this.notif = obj;
+}
+
+
+
+
