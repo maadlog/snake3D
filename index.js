@@ -21,12 +21,12 @@ function Init(){
   var bottom_left_position = [cw/4,cw/8,0]
   var scale = [2,2];
   var guimarker = new GUIImageElement(game.ctx,bottom_left_position,false,scale,
-    "https://maadlog.github.io/snake3D/GUI/snake.png");
+    "GUI/snake.png");
 
   var bottom_left_position = [-1,-1,0.5]
   var scale = [2,2];
   var guiback = new GUIImageElement(game.ctx,bottom_left_position,true,scale,
-    "https://maadlog.github.io/snake3D/GUI/black.png");
+    "GUI/black.png");
 
   var bottom_left_position = [cw,ch,0.0]
   var scale = 8;
